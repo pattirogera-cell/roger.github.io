@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Completa de C# 5.0</title>
+    <!-- Estilos CSS -->
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --card-bg: #252526;
+            --text-color: #d4d4d4;
+            --accent-color: #007acc;
+            --keyword-color: #569cd6;
+            --string-color: #ce9178;
+            --comment-color: #6a9955;
+            --type-color: #4ec9b0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-style: italic;
+        }
+
+        .section {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            color: var(--accent-color);
+            border-bottom: 1px solid #3c3c3c;
+            padding-bottom: 8px;
+        }
+
+        pre {
+            background-color: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            border-radius: 5px;
+            padding: 15px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+
+        /* Coloreado de sintaxis simulado (Estilo VS Code / Visual Studio) */
+        .kw { color: var(--keyword-color); font-weight: bold; } /* Keywords */
+        .str { color: var(--string-color); }                  /* Strings */
+        .com { color: var(--comment-color); }                 /* Comments */
+        .typ { color: var(--type-color); }                    /* Types */
+
+        .badge {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Guía Práctica: C# 5.0</h1>
+            <p class="subtitle">Novedades clave y ejemplos para Visual Studio (.NET Framework 4.5)</p>
+        </header>
+
+        <!-- Sección 1: Introducción -->
+        <div class="section">
+            <h2>1. Introducción a C# 5.0</h2>
+            <p>
+                Lanzado junto con Visual Studio 2012 y .NET Framework 4.5, C# 5.0 revolucionó la programación asíncrona mediante la introducción del patrón <strong>Async / Await</strong>.
+            </p>
+        </div>
+
+        <!-- Sección 2: Async y Await -->
+        <div class="section">
+            <h2>2. Programación Asíncrona (<span class="badge">Lo más importante</span>)</h2>
+            <p>
+                Antes de C# 5, manejar hilos y callbacks requería un código complejo (IAsyncResult, BackgroundWorker). Con <code>async</code> y <code>await</code>, el código asíncrono se escribe de forma secuencial y limpia.
+            </p>
+            
+            <h3>Ejemplo de código:</h3>
+            <pre><code><span class="kw">using</span> System;
+<span class="kw">using</span> System.Net.Http;
+<span class="kw">using</span> System.Threading.Tasks;
+
+<span class="kw">class</span> <span class="typ">Program</span>
+{
+    <span class="com">// El método debe marcarse como async</span>
+    <span class="kw">static async</span> <span class="typ">Task</span> Main(<span class="typ">string</span>[] args)
+    {
+        Console.WriteLine(<span class="str">"Descargando contenido..."</span>);
+        
+        <span class="typ">string</span> resultado = <span class="kw">await</span> DescargarPaginaAsync(<span class="str">"https://example.com"</span>);
+        
+        Console.WriteLine(<span class="str">$"Longitud del contenido: {resultado.Length}"</span>);
+    }
+
+    <span class="kw">static async</span> <span class="typ">Task</span>&lt;<span class="typ">string</span>&gt; DescargarPaginaAsync(<span class="typ">string</span> url)
+    {
+        <span class="kw">using</span> (<span class="typ">HttpClient</span> client = <span class="kw">new</span> <span class="typ">HttpClient</span>())
+        {
+            <span class="com">// "await" libera el hilo principal mientras espera la respuesta de la red</span>
+            <span class="typ">string</span> html = <span class="kw">await</span> client.GetStringAsync(url);
+            <span class="kw">return</span> html;
+        }
+    }
+}</code></pre>
+        </div>
+
+        <!-- Sección 3: Caller Information Attributes -->
+        <div class="section">
+            <h2>3. Atributos de Información del Llamador (Caller Info Attributes)</h2>
+            <p>
+                Permite obtener información sobre el método invocador, el archivo fuente y el número de línea sin recurrir a la reflexión. Es ideal para depuración y registros (logging).
+            </p>
+            
+            <h3>Ejemplo de código:</h3>
+            <pre><code><span class="kw">using</span> System;
+<span class="kw">using</span> System.Runtime.CompilerServices;
+
+<span class="kw">class</span> <span class="typ">Logger</span>
+{
+    <span class="kw">public static void</span> Log(
+        <span class="typ">string</span> mensaje,
+        [<span class="typ">CallerMemberName</span>] <span class="typ">string</span> metodo = <span class="str">""</span>,
+        [<span class="typ">CallerFilePath</span>] <span class="typ">string</span> archivo = <span class="str">""</span>,
+        [<span class="typ">CallerLineNumber</span>] <span class="typ">int</span> linea = 0)
+    {
+        Console.WriteLine(<span class="str">$"[MENSAJE]: {mensaje}"</span>);
+        Console.WriteLine(<span class="str">$"[MÉTODO]:  {metodo}"</span>);
+        Console.WriteLine(<span class="str">$"[ARCHIVO]: {archivo}"</span>);
+        Console.WriteLine(<span class="str">$"[LÍNEA]:   {linea}"</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="typ">Program</span>
+{
+    <span class="kw">static void</span> Main()
+    {
+        <span class="com">// Al llamar a Log(), el compilador inyecta automáticamente los datos</span>
+        Logger.Log(<span class="str">"Ocurrió un evento importante."</span>);
+    }
+}</code></pre>
+        </div>
+
+        <!-- Sección 4: Corrección de Captura en foreach -->
+        <div class="section">
+            <h2>4. Captura de Variables de Bucle (Foreach Loop Bound Variables)</h2>
+            <p>
+                En C# 5 se corrigió un comportamiento confuso en las expresiones Lambda dentro de bucles <code>foreach</code>. En C# 4, la variable de iteración se compartía entre todas las iteraciones; en C# 5, cada iteración obtiene su propia copia.
+            </p>
+
+            <h3>Diferencia:</h3>
+            <pre><code><span class="kw">var</span> acciones = <span class="kw">new</span> <span class="typ">List</span>&lt;<span class="typ">Action</span>&gt;();
+<span class="kw">var</span> numeros = <span class="kw">new</span>[] { 1, 2, 3 };
+
+<span class="kw">foreach</span> (<span class="kw">var</span> n <span class="kw">in</span> numeros)
+{
+    acciones.Add(() => Console.WriteLine(n));
+}
+
+<span class="kw">foreach</span> (<span class="kw">var</span> accion <span class="kw">in</span> acciones)
+{
+    accion();
+}
+
+<span class="com">// Resultado en C# 4: 3 3 3 (Problema conocido)</span>
+<span class="com">// Resultado en C# 5: 1 2 3 (Corregido automáticamente)</span></code></pre>
+        </div>
+
+        <footer>
+            <p>Diseñado para visualizar en Visual Studio y Navegadores Web.</p>
+        </footer>
+    </div>
+
+</body>
+</html>
